@@ -2,38 +2,31 @@ import turtle
 
 # Create screen
 screen = turtle.Screen()
-screen.title("Turtle Pattern Generator")
 screen.bgcolor("black")
-screen.setup(width=800, height=600)
+screen.title("Turtle Pattern Generator")
 
 # Create turtle
-pen = turtle.Turtle()
-pen.speed(0)
-pen.pensize(2)
+t = turtle.Turtle()
+t.speed(0)
+t.pensize(2)
+t.color("cyan")
 
-# User input
-color = input("Enter pen color (red, blue, green, yellow): ")
-size = int(input("Enter pattern size: "))
+# Draw geometric pattern
+for i in range(36):
+    for j in range(4):
+        t.forward(100)
+        t.right(90)
+    t.right(10)
 
-pen.color(color)
-
-# Draw spiral pattern
-for i in range(size):
-    pen.forward(i * 2)
-    pen.right(91)
-
-# Draw a colorful geometric pattern
-colors = ["red", "yellow", "blue", "green", "purple"]
-
-pen.penup()
-pen.goto(0, 0)
-pen.pendown()
+# Draw spiral
+t.penup()
+t.goto(-100, -100)
+t.pendown()
+t.color("yellow")
 
 for i in range(100):
-    pen.color(colors[i % len(colors)])
-    pen.forward(100)
-    pen.right(144)
+    t.forward(i * 2)
+    t.right(91)
 
-# Finish drawing
-pen.hideturtle()
+# Finish
 turtle.done()

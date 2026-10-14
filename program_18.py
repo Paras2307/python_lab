@@ -1,137 +1,118 @@
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import messagebox, filedialog
+import json
 
-# Main window
 root = tk.Tk()
 root.title("Student Record Manager")
-root.geometry("500x600")
+root.geometry("400x500")
 
-# Variables
-gender = tk.StringVar(value="Male")
-sports = tk.IntVar()
+students = {}
 
-# Student name
-tk.Label(root, text="Student Name:").pack()
-name_entry = tk.Entry(root, width=40)
-name_entry.pack()
+# Student details
+tk.Label(root, text="Student Record Manager",
+         font=("Arial", 16)).pack()
 
-# Roll number
-tk.Label(root, text="Roll Number:").pack()
-roll_entry = tk.Entry(root, width=40)
-roll_entry.pack()
+tk.Label(root, text="Name").pack()
+name = tk.Entry(root)
+name.pack()
 
-# Course
-tk.Label(root, text="Course:").pack()
-course_entry = tk.Entry(root, width=40)
-course_entry.pack()
+tk.Label(root, text="Roll Number").pack()
+roll = tk.Entry(root)
+roll.pack()
+
+tk.Label(root, text="Course").pack()
+course = tk.Entry(root)
+course.pack()
 
 # Gender selection
-tk.Label(root, text="Gender:").pack()
-tk.Radiobutton(root, text="Male", variable=gender, value="Male").pack()
-tk.Radiobutton(root, text="Female", variable=gender, value="Female").pack()
+tk.Label(root, text="Gender").pack()
+gender = tk.StringVar(value="Male")
 
-# Sports selection
-tk.Checkbutton(
-    root, text="Interested in Sports", variable=sports
-).pack()
+tk.Radiobutton(root, text="Male", variable=gender,
+               value="Male").pack()
+tk.Radiobutton(root, text="Female", variable=gender,
+               value="Female").pack()
+
+# Checkbutton
+sports = tk.IntVar()
+tk.Checkbutton(root, text="Interested in Sports",
+               variable=sports).pack()
 
 # Address
-tk.Label(root, text="Address:").pack()
-address_text = tk.Text(root, width=40, height=4)
-address_text.pack()
+tk.Label(root, text="Address").pack()
+address = tk.Text(root, height=3, width=30)
+address.pack()
 
-# Save student record
+# Save record
 def save_record():
-    name = name_entry.get()
-    roll = roll_entry.get()
-    course = course_entry.get()
-    address = address_text.get("1.0", tk.END).strip()
+    r = roll.get()
 
-    if not name or not roll or not course:
-        messagebox.showerror("Error", "Please fill all required fields.")
+    if not name.get() or not r or not course.get():
+        messagebox.showerror("Error", "Fill all fields")
         return
 
-    record = (
-        f"Name: {name}\n"
-        f"Roll Number: {roll}\n"
-        f"Course: {course}\n"
-        f"Gender: {gender.get()}\n"
-        f"Sports: {'Yes' if sports.get() else 'No'}\n"
-        f"Address: {address}\n"
-        f"{'-' * 30}\n"
+    students[r] = {
+        "Name": name.get(),
+        "Course": course.get(),
+        "Gender": gender.get(),
+        "Sports": sports.get(),
+        "Address": address.get("1.0", tk.END).strip()
+    }
+
+    file = filedialog.asksaveasfilename(
+        defaultextension=".json",
+        filetypes=[("JSON Files", "*.json")]
     )
 
-    filename = filedialog.asksaveasfilename(
-        defaultextension=".txt",
-        filetypes=[("Text Files", "*.txt")]
+    if file:
+        with open(file, "w") as f:
+            json.dump(students, f, indent=4)
+        messagebox.showinfo("Success", "Record saved")
+
+# Retrieve record
+def retrieve_record():
+    file = filedialog.askopenfilename(
+        filetypes=[("JSON Files", "*.json")]
     )
 
-    if filename:
-        with open(filename, "a") as file:
-            file.write(record)
+    if file:
+        with open(file, "r") as f:
+            data = json.load(f)
 
-        messagebox.showinfo("Success", "Record saved successfully!")
+        students.update(data)
+        r = roll.get()
 
+        if r in students:
+            s = students[r]
+            name.delete(0, tk.END)
+            name.insert(0, s["Name"])
+            course.delete(0, tk.END)
+            course.insert(0, s["Course"])
+            gender.set(s["Gender"])
+            sports.set(s["Sports"])
+            address.delete("1.0", tk.END)
+            address.insert("1.0", s["Address"])
+        else:
+            messagebox.showerror("Error", "Record not found")
 
-# View student records
-def view_records():
-    filename = filedialog.askopenfilename(
-        filetypes=[("Text Files", "*.txt")]
-    )
+# Delete record
+def delete_record():
+    r = roll.get()
 
-    if filename:
-        try:
-            with open(filename, "r") as file:
-                data = file.read()
-
-            # Display records in a new window
-            window = tk.Toplevel(root)
-            window.title("Student Records")
-
-            text = tk.Text(window, width=60, height=25)
-            text.pack()
-            text.insert(tk.END, data)
-
-        except Exception as e:
-            messagebox.showerror("Error", str(e))
-
-
-# Clear form
-def clear_form():
-    name_entry.delete(0, tk.END)
-    roll_entry.delete(0, tk.END)
-    course_entry.delete(0, tk.END)
-    address_text.delete("1.0", tk.END)
-    gender.set("Male")
-    sports.set(0)
-
-
-# Delete saved file
-def delete_records():
-    filename = filedialog.askopenfilename(
-        filetypes=[("Text Files", "*.txt")]
-    )
-
-    if filename:
-        confirm = messagebox.askyesno(
-            "Confirm Delete",
-            "Are you sure you want to delete this file?"
-        )
-
-        if confirm:
-            import os
-            try:
-                os.remove(filename)
-                messagebox.showinfo("Success", "File deleted successfully!")
-            except Exception as e:
-                messagebox.showerror("Error", str(e))
-
+    if r in students:
+        del students[r]
+        messagebox.showinfo("Success", "Record deleted")
+    else:
+        messagebox.showerror("Error", "Record not found")
 
 # Buttons
-tk.Button(root, text="Save Record", command=save_record).pack(pady=5)
-tk.Button(root, text="View Records", command=view_records).pack(pady=5)
-tk.Button(root, text="Delete Record File", command=delete_records).pack(pady=5)
-tk.Button(root, text="Clear Form", command=clear_form).pack(pady=5)
+tk.Button(root, text="Save Record",
+          command=save_record).pack(pady=5)
 
-# Run application
+tk.Button(root, text="Retrieve Record",
+          command=retrieve_record).pack(pady=5)
+
+tk.Button(root, text="Delete Record",
+          command=delete_record).pack(pady=5)
+
 root.mainloop()

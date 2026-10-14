@@ -2,132 +2,78 @@ import tkinter as tk
 from tkinter import messagebox
 import json
 
-# Main application
+# Create main window
 root = tk.Tk()
-root.title("Multi-Frame Dashboard")
-root.geometry("600x400")
+root.title("Dashboard Application")
+root.geometry("500x400")
 
 # Application data
-config = {"username": "", "theme": "light"}
+data = {"username": "", "theme": "Light"}
+
+# Save configuration
+def save_data():
+    with open("config.json", "w") as file:
+        json.dump(data, file)
+    messagebox.showinfo("Success", "Configuration saved")
+
+# Show home frame
+def show_home():
+    settings_frame.pack_forget()
+    home_frame.pack(fill="both", expand=True)
+
+# Show settings frame
+def show_settings():
+    home_frame.pack_forget()
+    settings_frame.pack(fill="both", expand=True)
 
 # Menu bar
-menubar = tk.Menu(root)
+menu = tk.Menu(root)
+root.config(menu=menu)
 
-file_menu = tk.Menu(menubar, tearoff=0)
-file_menu.add_command(label="Save Configuration", command=lambda: save_config())
-file_menu.add_command(label="Exit", command=root.quit)
-menubar.add_cascade(label="File", menu=file_menu)
+menu.add_command(label="Home", command=show_home)
+menu.add_command(label="Settings", command=show_settings)
+menu.add_command(label="Save", command=save_data)
 
-root.config(menu=menubar)
+# Home frame
+home_frame = tk.Frame(root)
+tk.Label(home_frame, text="Welcome to Dashboard",
+         font=("Arial", 18)).pack(pady=20)
 
-# Main frame
-main_frame = tk.Frame(root)
-main_frame.pack(fill="both", expand=True)
-
-# Dashboard frame
-dashboard_frame = tk.Frame(main_frame)
-dashboard_frame.pack(fill="both", expand=True)
-
-tk.Label(
-    dashboard_frame,
-    text="Welcome to Dashboard",
-    font=("Arial", 20)
-).pack(pady=20)
-
-# Username input
-tk.Label(dashboard_frame, text="Enter Username:").pack()
-
-username_entry = tk.Entry(dashboard_frame)
-username_entry.pack(pady=5)
-
-# Status label
-status_label = tk.Label(dashboard_frame, text="Ready")
-status_label.pack(pady=10)
-
-
-# Show dashboard information
-def show_dashboard():
-    name = username_entry.get()
-
-    if name.strip():
-        config["username"] = name
-        status_label.config(text="Welcome, " + name)
-    else:
-        messagebox.showwarning("Warning", "Please enter a username!")
-
-
-# Save configuration to file
-def save_config():
-    config["username"] = username_entry.get()
-
-    try:
-        with open("dashboard_config.json", "w") as file:
-            json.dump(config, file, indent=4)
-
-        messagebox.showinfo("Success", "Configuration saved successfully!")
-
-    except OSError as e:
-        messagebox.showerror("Error", str(e))
-
+tk.Button(home_frame, text="Open Settings",
+          command=show_settings).pack()
 
 # Settings frame
-settings_frame = tk.Frame(main_frame)
+settings_frame = tk.Frame(root)
 
-tk.Label(
-    settings_frame,
-    text="Dashboard Settings",
-    font=("Arial", 18)
-).pack(pady=20)
+tk.Label(settings_frame, text="Settings",
+         font=("Arial", 18)).pack(pady=10)
 
-tk.Label(settings_frame, text="Select Theme:").pack()
+tk.Label(settings_frame, text="Enter Username").pack()
 
-theme_var = tk.StringVar(value="light")
+username = tk.Entry(settings_frame)
+username.pack()
 
-tk.Radiobutton(
-    settings_frame, text="Light",
-    variable=theme_var, value="light"
-).pack()
+theme = tk.StringVar(value="Light")
 
-tk.Radiobutton(
-    settings_frame, text="Dark",
-    variable=theme_var, value="dark"
-).pack()
+tk.Radiobutton(settings_frame, text="Light",
+               variable=theme, value="Light").pack()
 
+tk.Radiobutton(settings_frame, text="Dark",
+               variable=theme, value="Dark").pack()
 
-def save_theme():
-    config["theme"] = theme_var.get()
-    save_config()
+def update_data():
+    data["username"] = username.get()
+    data["theme"] = theme.get()
+    messagebox.showinfo("Success", "Settings updated")
 
+tk.Button(settings_frame, text="Update Settings",
+          command=update_data).pack(pady=10)
 
-tk.Button(
-    settings_frame,
-    text="Save Theme",
-    command=save_theme
-).pack(pady=10)
+tk.Button(settings_frame, text="Back Home",
+          command=show_home).pack()
 
-
-# Frame navigation
-def show_frame(frame):
-    dashboard_frame.pack_forget()
-    settings_frame.pack_forget()
-    frame.pack(fill="both", expand=True)
-
-
-# Navigation buttons
-tk.Button(
-    dashboard_frame,
-    text="Open Settings",
-    command=lambda: show_frame(settings_frame)
-).pack(pady=5)
-
-tk.Button(
-    settings_frame,
-    text="Back to Dashboard",
-    command=lambda: show_frame(dashboard_frame)
-).pack(pady=5)
-
-# Display dashboard initially
-show_frame(dashboard_frame)
+# Show home initially
+home_frame.pack(fill="both", expand=True)
 
 # Run application
 root.mainloop()

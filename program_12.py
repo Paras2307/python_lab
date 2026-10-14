@@ -1,42 +1,33 @@
 from PIL import Image, ImageFilter
 
 # Open image
-path = input("Enter image path: ")
-img = Image.open(path).convert("RGB")
+img = Image.open("image.jpg")
 
+# Display menu
 print("1. Grayscale")
 print("2. Black and White")
 print("3. Blur")
-print("4. Save Original Copy")
 
-choice = int(input("Enter your choice: "))
+choice = input("Enter your choice: ")
 
-if choice == 1:
-    # Convert image to grayscale
+# Apply filter
+if choice == "1":
     result = img.convert("L")
-    print("Image converted to grayscale.")
+    print("Grayscale image created.")
 
-elif choice == 2:
-    # Convert image to black and white
-    gray = img.convert("L")
-    result = gray.point(lambda x: 255 if x > 128 else 0)
-    print("Image converted to black and white.")
+elif choice == "2":
+    img = img.convert("L")
+    result = img.point(lambda x: 255 if x > 128 else 0)
+    print("Black and White image created.")
 
-elif choice == 3:
-    # Apply blur filter
+elif choice == "3":
     result = img.filter(ImageFilter.BLUR)
-    print("Blur filter applied.")
-
-elif choice == 4:
-    # Keep original image unchanged
-    result = img
+    print("Blur image created.")
 
 else:
-    print("Invalid choice.")
+    print("Invalid choice")
     exit()
 
-# Save processed image
-output_path = input("Enter output file name (e.g., output.png): ")
-result.save(output_path)
-
-print("Image saved successfully as", output_path)
+# Save output image
+result.save("output.png")
+print("Image saved as output.png")

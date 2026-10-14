@@ -1,45 +1,33 @@
 import traceback
 
 # Custom exception
-class InvalidFileFormat(Exception):
+class InvalidFileError(Exception):
     pass
 
+try:
+    file = open("data.txt", "r")
 
-# File processing function
-def process_file(filename):
-    file = None
+    for line in file:
+        if not line.strip():
+            raise InvalidFileError("Empty line found")
+        print(line.strip())
 
+except FileNotFoundError:
+    print("Error: File not found")
+
+except InvalidFileError as e:
+    print("Error:", e)
+    traceback.print_exc()
+
+except Exception as e:
+    print("Unexpected error:", e)
+
+else:
+    print("File processed successfully")
+
+finally:
     try:
-        file = open(filename, "r")
-
-        data = file.read()
-
-        if not data.strip():
-            raise InvalidFileFormat("File is empty!")
-
-        print("File content:")
-        print(data)
-
-    except FileNotFoundError:
-        print("Error: File not found!")
-
-    except InvalidFileFormat as e:
-        print("Error:", e)
-        traceback.print_exc()
-
-    except Exception:
-        print("An unexpected error occurred!")
-        traceback.print_exc()
-
-    else:
-        print("File processed successfully!")
-
-    finally:
-        if file is not None:
-            file.close()
-        print("File closed safely.")
-
-
-# Main program
-filename = input("Enter file name: ")
-process_file(filename)
+        file.close()
+        print("File closed")
+    except NameError:
+        print("File was not opened")

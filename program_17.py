@@ -1,56 +1,53 @@
 import tkinter as tk
 
-# Create main window
+# Create window
 root = tk.Tk()
 root.title("Desktop Calculator")
 root.geometry("300x400")
 
-# Display field
+# Display
 entry = tk.Entry(root, font=("Arial", 20), justify="right")
 entry.grid(row=0, column=0, columnspan=4, padx=10, pady=10)
 
-# Button click function
+# Button function
 def click(value):
-    entry.insert(tk.END, value)
+    if value == "=":
+        try:
+            result = eval(entry.get())
+            entry.delete(0, tk.END)
+            entry.insert(0, str(result))
+        except:
+            entry.delete(0, tk.END)
+            entry.insert(0, "Error")
 
-# Calculate result
-def calculate():
-    try:
-        result = eval(entry.get())
+    elif value == "C":
         entry.delete(0, tk.END)
-        entry.insert(0, str(result))
-    except:
-        entry.delete(0, tk.END)
-        entry.insert(0, "Error")
 
-# Clear display
-def clear():
-    entry.delete(0, tk.END)
+    else:
+        entry.insert(tk.END, value)
 
 # Calculator buttons
 buttons = [
-    ("7", 1, 0), ("8", 1, 1), ("9", 1, 2), ("/", 1, 3),
-    ("4", 2, 0), ("5", 2, 1), ("6", 2, 2), ("*", 2, 3),
-    ("1", 3, 0), ("2", 3, 1), ("3", 3, 2), ("-", 3, 3),
-    ("0", 4, 0), (".", 4, 1), ("+", 4, 2), ("=", 4, 3)
+    "7", "8", "9", "/",
+    "4", "5", "6", "*",
+    "1", "2", "3", "-",
+    "C", "0", "=", "+"
 ]
 
-# Create buttons
-for (text, row, col) in buttons:
-    if text == "=":
-        command = calculate
-    else:
-        command = lambda value=text: click(value)
+row = 1
+col = 0
 
+for b in buttons:
     tk.Button(
-        root, text=text, width=5, height=2,
-        command=command, font=("Arial", 14)
-    ).grid(row=row, column=col, padx=3, pady=3)
+        root, text=b, width=5, height=2,
+        font=("Arial", 14),
+        command=lambda x=b: click(x)
+    ).grid(row=row, column=col, padx=5, pady=5)
 
-# Clear button
-tk.Button(
-    root, text="Clear", width=25, command=clear
-).grid(row=5, column=0, columnspan=4, pady=10)
+    col += 1
+    if col == 4:
+        col = 0
+        row += 1
 
-# Run application
+# Run calculator
 root.mainloop()

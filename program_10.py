@@ -1,41 +1,26 @@
-# Inventory of different stores
-store1 = {"Apple": 50, "Banana": 30, "Mango": 20}
-store2 = {"Apple": 40, "Orange": 25, "Mango": 15}
-store3 = {"Banana": 20, "Orange": 10, "Grapes": 35}
+# Inventory of two stores
+store1 = {"Pen": 50, "Book": 30, "Pencil": 40}
+store2 = {"Pen": 20, "Book": 15, "Eraser": 25}
 
-# Display inventories
-print("Store 1:", store1)
-print("Store 2:", store2)
-print("Store 3:", store3)
+print("Store 1 Inventory:", store1)
+print("Store 2 Inventory:", store2)
 
-# Merge all inventories
-inventory = {}
+# Check if an item exists
+item = input("Enter item name: ")
 
-for store in (store1, store2, store3):
-    for item, quantity in store.items():
-        inventory[item] = inventory.get(item, 0) + quantity
-
-print("\nCombined Inventory:", inventory)
-
-# Check whether an item exists
-item = input("\nEnter item to search: ")
-
-if item in inventory:
-    print(item, "is available.")
-    print("Total quantity:", inventory.get(item, 0))
+if item in store1:
+    print("Quantity in Store 1:", store1.get(item))
 else:
-    print(item, "is not available.")
+    print("Item not found in Store 1")
 
-# Dictionary comprehension to find low-stock items
-low_stock = {
-    item: quantity
-    for item, quantity in inventory.items()
-    if quantity < 50
-}
+# Merge inventories
+inventory = store1.copy()
 
-print("\nLow Stock Items:", low_stock)
+for item, quantity in store2.items():
+    inventory[item] = inventory.get(item, 0) + quantity
 
-# Add a new item using update()
-inventory.update({"Pineapple": 40})
+print("Combined Inventory:", inventory)
 
-print("\nInventory after adding new item:", inventory)
+# Dictionary comprehension
+result = {item: qty for item, qty in inventory.items() if qty > 20}
+print("Items with quantity greater than 20:", result)

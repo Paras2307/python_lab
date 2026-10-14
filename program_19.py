@@ -1,95 +1,77 @@
 import tkinter as tk
-from tkinter import filedialog, colorchooser, messagebox
+from tkinter import filedialog, messagebox, colorchooser
 from PIL import Image, ImageTk
 
-# Create main window
+# Create window
 root = tk.Tk()
 root.title("Image and File Viewer")
-root.geometry("700x500")
+root.geometry("600x500")
 
-# Create canvas
-canvas = tk.Canvas(root, width=500, height=300, bg="white")
-canvas.pack(pady=10)
+# Label
+label = tk.Label(root, text="Image and File Viewer",
+                 font=("Arial", 16))
+label.pack(pady=10)
 
-# Create label
-label = tk.Label(root, text="Open an image or text file")
-label.pack()
+# Display area
+display = tk.Label(root, text="Open an image or text file")
+display.pack(pady=20)
 
-# Open image or text file
-def open_file(event=None):
-    filename = filedialog.askopenfilename(
-        filetypes=[
-            ("Image Files", "*.png *.jpg *.jpeg"),
-            ("Text Files", "*.txt"),
-            ("All Files", "*.*")
-        ]
+# Open image
+def open_image():
+    file = filedialog.askopenfilename(
+        filetypes=[("Image Files", "*.png *.jpg *.jpeg")]
     )
 
-    if not filename:
-        return
-
-    try:
-        if filename.lower().endswith((".png", ".jpg", ".jpeg")):
-            img = Image.open(filename)
-            img.thumbnail((500, 300))
-
+    if file:
+        try:
+            img = Image.open(file)
+            img.thumbnail((400, 300))
             photo = ImageTk.PhotoImage(img)
-            canvas.delete("all")
-            canvas.create_image(250, 150, image=photo)
-            canvas.image = photo
 
-            label.config(text="Image: " + filename)
+            display.config(image=photo, text="")
+            display.image = photo
 
-        elif filename.lower().endswith(".txt"):
-            with open(filename, "r", encoding="utf-8") as file:
-                content = file.read()
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
 
-            canvas.delete("all")
-            canvas.create_text(
-                10, 10,
-                anchor="nw",
-                text=content,
-                width=480,
-                fill="black"
-            )
+# Open text file
+def open_text():
+    file = filedialog.askopenfilename(
+        filetypes=[("Text Files", "*.txt")]
+    )
 
-            label.config(text="Text File: " + filename)
+    if file:
+        try:
+            with open(file, "r") as f:
+                content = f.read()
 
-        else:
-            messagebox.showwarning(
-                "Unsupported File",
-                "Please select an image or text file."
-            )
+            display.config(image="", text=content,
+                           wraplength=500, justify="left")
+            display.image = None
 
-    except Exception as e:
-        messagebox.showerror("Error", str(e))
-
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
 
 # Change background color
 def change_color():
-    color = colorchooser.askcolor(title="Choose Background Color")
+    color = colorchooser.askcolor()[1]
 
-    if color[1]:
-        canvas.config(bg=color[1])
-
-
-# Show information
-def show_info():
-    messagebox.showinfo(
-        "Information",
-        "Interactive Image and File Viewer\n"
-        "Open images or text files and change the background color."
-    )
-
+    if color:
+        root.config(bg=color)
+        label.config(bg=color)
 
 # Buttons
-tk.Button(root, text="Open File", command=open_file).pack(pady=5)
-tk.Button(root, text="Change Background", command=change_color).pack(pady=5)
-tk.Button(root, text="About", command=show_info).pack(pady=5)
+tk.Button(root, text="Open Image",
+          command=open_image).pack(pady=5)
 
-# Bind keyboard and mouse events
-root.bind("<Return>", open_file)
-canvas.bind("<Button-1>", lambda event: change_color())
+tk.Button(root, text="Open Text File",
+          command=open_text).pack(pady=5)
+
+tk.Button(root, text="Change Background Color",
+          command=change_color).pack(pady=5)
+
+# Keyboard event
+root.bind("<Return>", lambda event: open_image())
 
 # Run application
 root.mainloop()

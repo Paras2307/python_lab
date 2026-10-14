@@ -1,46 +1,11 @@
 from abc import ABC, abstractmethod
 import math
 
-# Abstract base class
+# Abstract class
 class Shape(ABC):
-
     @abstractmethod
     def area(self):
         pass
-
-    @abstractmethod
-    def display(self):
-        pass
-
-
-# Vector class
-class Vector(Shape):
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def area(self):
-        return 0
-
-    def display(self):
-        print(self)
-
-    # Operator overloading for addition
-    def __add__(self, other):
-        return Vector(self.x + other.x, self.y + other.y)
-
-    # Operator overloading for equality
-    def __eq__(self, other):
-        return self.x == other.x and self.y == other.y
-
-    # Operator overloading for less than
-    def __lt__(self, other):
-        return math.sqrt(self.x**2 + self.y**2) < math.sqrt(other.x**2 + other.y**2)
-
-    # Operator overloading for string representation
-    def __str__(self):
-        return f"Vector({self.x}, {self.y})"
-
 
 # Circle class
 class Circle(Shape):
@@ -50,23 +15,28 @@ class Circle(Shape):
     def area(self):
         return math.pi * self.radius * self.radius
 
-    def display(self):
-        print("Circle Radius:", self.radius)
-        print("Circle Area:", round(self.area(), 2))
+    def __add__(self, other):
+        return self.area() + other.area()
 
+    def __eq__(self, other):
+        return self.area() == other.area()
 
-# Main program
-v1 = Vector(2, 3)
-v2 = Vector(4, 5)
+    def __lt__(self, other):
+        return self.area() < other.area()
 
-print("First Vector:", v1)
-print("Second Vector:", v2)
+    def __str__(self):
+        return f"Circle with radius {self.radius}"
 
-v3 = v1 + v2
-print("Vector Addition:", v3)
+# Create objects
+c1 = Circle(5)
+c2 = Circle(3)
 
-print("Are vectors equal?", v1 == v2)
-print("Is first vector smaller?", v1 < v2)
+print(c1)
+print(c2)
 
-c = Circle(5)
-c.display()
+print("Area of Circle 1:", round(c1.area(), 2))
+print("Area of Circle 2:", round(c2.area(), 2))
+
+print("Sum of Areas:", round(c1 + c2, 2))
+print("Both circles have equal area:", c1 == c2)
+print("Circle 1 is smaller than Circle 2:", c1 < c2)

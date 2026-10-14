@@ -1,43 +1,36 @@
 import pickle
 import shelve
 
-# Student class
+# Create a class
 class Student:
     def __init__(self, name, marks):
         self.name = name
         self.marks = marks
 
-    def display(self):
-        print("Name:", self.name)
-        print("Marks:", self.marks)
-
-
-# Create an object
-s1 = Student("Rahul", 85)
+# Create object
+s1 = Student("Rahul", 90)
 
 # Save object using pickle
 with open("student.pkl", "wb") as file:
     pickle.dump(s1, file)
 
-print("Object saved using pickle.")
+print("Object saved using pickle")
 
-# Restore object using pickle
+# Load object using pickle
 with open("student.pkl", "rb") as file:
     s2 = pickle.load(file)
 
-print("\nRestored Object:")
-s2.display()
+print("Name:", s2.name)
+print("Marks:", s2.marks)
 
-
-# Save object using shelve
+# Save data using shelve
 with shelve.open("student_data") as db:
-    db["student1"] = s1
+    db["student"] = s1
 
-print("\nObject saved using shelve.")
+print("Object saved using shelve")
 
-# Restore object using shelve
+# Read data using shelve
 with shelve.open("student_data") as db:
-    s3 = db["student1"]
-
-print("\nObject restored using shelve:")
-s3.display()
+    s3 = db["student"]
+    print("Name:", s3.name)
+    print("Marks:", s3.marks)
